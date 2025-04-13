@@ -1,18 +1,18 @@
-# Use the official .NET SDK image to build the app
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy csproj and restore as distinct layers
-COPY CalculatorService.csproj ./  # This will copy the CalculatorService.csproj to the Docker image
-RUN dotnet restore CalculatorService.csproj
+# Copy csproj and restore
+COPY ./CalculatorService.csproj ./
+RUN dotnet restore
 
-# Copy the rest of the code and publish
-COPY . ./  # This copies the entire CalculatorService folder (current context)
-WORKDIR /app
+# Copy all source and build
+COPY . ./
 RUN dotnet publish -c Release -o /out
 
-# Use a runtime image for the final output
+# Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /out ./
+COPY --from=build /out .
+
 ENTRYPOINT ["dotnet", "CalculatorService.dll"]
