@@ -6,8 +6,8 @@ on:
       - main   # Trigger the workflow on push to the main branch
 
 env:
-  ECR_REGISTRY: ${{ var.AWS_ECR_REGISTRY }}  # Your AWS ECR registry URL, stored in GitHub secrets
-  ECR_REPOSITORY: ${{ var.AWS_ECR_REPOSITORY_NAME }}          # ECR repository name
+  ECR_REGISTRY: ${{ env.AWS_ECR_REGISTRY }}  # Your AWS ECR registry URL, stored in GitHub secrets
+  ECR_REPOSITORY: ${{ env.AWS_ECR_REPOSITORY_NAME }}          # ECR repository name
   IMAGE_TAG: latest                             # You can dynamically set this as needed
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ var.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION }}
         
     - name: Build and push Docker image
       run: |
