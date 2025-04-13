@@ -1,4 +1,4 @@
-# web-calculator-api-test
+# butterfly-test
 
 ## Project Overview
 This project demonstrates the development of a demo API server as part of a technical interview. The API provides basic calculator functionality, supporting four operations: **addition, subtraction, multiplication, and division** with two numerical inputs.
