@@ -3,11 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
-COPY CalculatorService/CalculatorService.csproj ./  # Correct the path from the root
+COPY CalculatorService.csproj ./  # Copy the csproj file to /app in the container
 RUN dotnet restore CalculatorService.csproj
 
 # Copy the rest of the source code and build
-COPY CalculatorService/. ./
+COPY . ./  # Copy all source files from the current directory (CalculatorService)
 RUN dotnet publish -c Release -o /out
 
 # Stage 2: Runtime
