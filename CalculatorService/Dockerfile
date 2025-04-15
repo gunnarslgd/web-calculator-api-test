@@ -1,29 +1,34 @@
-# Stage 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Use Amazon Linux as the base image
+FROM amazonlinux:2
 
-# Ensure the working directory exists
-WORKDIR /app
+# Update the package manager and install Python, net-tools, and curl
+RUN yum update -y && \
+    yum install -y python3 net-tools curl
+	
+	
+# Set the working directory inside the container
+WORKDIR /usr/src/app
 
-# Copy the .csproj file into the container's /app directory
-COPY CalculatorService.csproj ./ 
+# Create index.html dynamically
+RUN echo '<html>' > index.html && \
+    echo '    <head>' >> index.html && \
+    echo '        <title>IP Addresses</title>' >> index.html && \
+    echo '    </head>' >> index.html && \
+    echo '    <body>' >> index.html && \
+    echo '        <h1>IP Address Information</h1>' >> index.html && \
+    echo '        <p>Your IP Address: <span id="client-ip"></span></p>' >> index.html && \
+    echo '        <p>Host IP Address: <span id="host-ip"></span></p>' >> index.html && \
+    echo '        <script>' >> index.html && \
+    echo '            document.getElementById("client-ip").innerText = window.location.hostname;' >> index.html && \
+    echo '            fetch("/api/host-ip")' >> index.html && \
+    echo '                .then(response => response.text())' >> index.html && \
+    echo '                .then(data => document.getElementById("host-ip").innerText = data);' >> index.html && \
+    echo '        </script>' >> index.html && \
+    echo '    </body>' >> index.html && \
+    echo '</html>' >> index.html
 
-# Restore dependencies
-RUN dotnet restore CalculatorService.csproj
+# Expose the port that the app will run on
+EXPOSE 80
 
-# Copy the rest of the application into the container
-COPY . ./ 
-
-# Publish the application to /out
-RUN dotnet publish -c Release -o /out
-
-# Stage 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-
-# Set the working directory to /app in the runtime container
-WORKDIR /app
-
-# Copy the published application from the build stage to the runtime container
-COPY --from=build /out .
-
-# Set entry point for the container to run the application
-ENTRYPOINT ["dotnet", "CalculatorService.dll"]
+# Command to run the HTTP server
+CMD ["python3", "-m", "http.server", "80"]
